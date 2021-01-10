@@ -15,7 +15,7 @@ class Home extends BaseController
 {
   public function setLocation(){
     $data = [
-       'country_id' => "101",
+       'country_id' => "1",
       'state_id' => "10",
       'city_id' => "707",
       'region_id' => ""
@@ -27,6 +27,7 @@ class Home extends BaseController
 
     $query1 = json_decode(file_get_contents("https://tools.keycdn.com/geo.json?host=".$ip_address),true);
     $query = $query1['data']['geo'];
+    //var_dump($query['country_code']);
       $resquery = $db->query("Select id from countries where sortname='".$query['country_code']."'");
       $result = $resquery->getResult('array');
       if(count($result)>0){
@@ -47,11 +48,14 @@ class Home extends BaseController
 
 	public function index()
    {
-     
+    
     
     $sessionStateId= session()->get('state_id');
+    $this->setLocation(); 
+    //var_dump($sessionStateId);
     if(!isset($sessionStateId) || $sessionStateId==''){
-        $this->setLocation(); 
+      
+        
     }
     
     $db = \Config\Database::connect();

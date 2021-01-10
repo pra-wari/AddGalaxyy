@@ -1770,7 +1770,7 @@ _______________________________________________________*/
     transform: translateY(-50%);
     -moz-transform: translateY(-50%);
     -webkit-transform: translateY(-50%);
-    -0-transform: translateY(-50%);
+    transform: translateY(-50%);
     overflow: visible;
     height: 36px;
     width: 36px;
@@ -1779,7 +1779,7 @@ _______________________________________________________*/
     transition: all 0.3s ease-in-out 0s;
     -moz-transition: all 0.3s ease-in-out 0s;
     -webkit-transition: all 0.3s ease-in-out 0s;
-    -0-transition: all 0.3s ease-in-out 0s;
+    transition: all 0.3s ease-in-out 0s;
 }
 
 .banner:hover .owl-buttons .owl-next, .banner:hover .owl-buttons .owl-prev {
@@ -5351,8 +5351,10 @@ ul.sub_list li span {
 }
 
 .product-item-name {
+    white-space: nowrap;
+    overflow: hidden;
   text-overflow: ellipsis;
-  overflow: hidden;
+  
 }
 
 .product-image {

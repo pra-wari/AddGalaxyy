@@ -71,9 +71,9 @@ class Users extends Controller
 					$this->setUserSession($user);
 					
 					if($user['username']=='admin' || $user['usertype']=='admin' || $user['usertype']=='administrator'){
-						return redirect()->to('/admin');
+						return redirect()->to(base_url('/admin'));
 					}else{
-						return redirect()->to('/dashboard');
+						return redirect()->to(base_url('/dashboard'));
 					}
 				}else{
 					$session->setFlashdata('fail', 'This Account Does not exists!');
@@ -1318,7 +1318,7 @@ foreach ($queryplan->getResult() as $rowplan)
 		session()->destroy();
 		$session = session();
 		$session->setFlashdata('success', 'Successfully Logout');
-		return redirect()->to('/');
+		return redirect()->to(base_url('/'));
 	}
 
 	public function fetchpostaddata(){
