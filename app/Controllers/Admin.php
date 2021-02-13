@@ -354,7 +354,8 @@ class Admin extends Controller
 	}
     
     public function planactive(){
-    $session = session();
+	
+	$session = session();
 	$db = \Config\Database::connect();
 	$userid = $session->get('id');
 	if(!$userid){
@@ -371,7 +372,17 @@ class Admin extends Controller
     }
     elseif($adtype=='premium' && $value==1){
         $db->query("update listing set premium=1 where id=$adid");
-        $db->query("update listing set premium_status=2 where id=$adid");
+		$db->query("update listing set premium_status=2 where id=$adid");
+		
+		$x = $db->query("select * from users_plan_relation where listing_id = $adid");
+		$res = $x->getResult();
+		$date = $res[0]->plan_end_date;
+		$days = $this->request->getVar('days');
+		
+		$updated_date = date('Y-m-d H:i:s',strtotime($date." + $days days"));
+		
+		$db->query("update users_plan_relation set plan_end_date = '".$updated_date."' where listing_id = $adid");
+		
     }
     elseif($adtype=='sgallery' && $value==0){
         $db->query("update listing set sgallery=0 where id=$adid");
@@ -389,7 +400,7 @@ class Admin extends Controller
         $db->query("update listing set featured=1 where id=$adid");
         $db->query("update listing set featured_status=2 where id=$adid");
     }
-    return redirect()->to('/admin/allads');
+    return redirect()->to(base_url('/admin/allads'));
     }
     
 	public function allads(){

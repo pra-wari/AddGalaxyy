@@ -45,7 +45,12 @@
   <link rel="stylesheet" type="text/css" href="<?php echo base_url('public/css/custom.css'); ?>">
   <link rel="stylesheet" type="text/css" href="<?php echo base_url('public/css/responsive.css'); ?>">
   <link rel="stylesheet" href="<?php echo base_url('public/css/swiper.min.css'); ?>">
+
   
+  <!-- //*****owl carousel css******** -->
+  <!-- <link rel="stylesheet" href="<?php echo base_url('public/owlCarousel/owl.carousel.min.css'); ?>">
+  <link rel="stylesheet" href="<?php echo base_url('public/owlCarousel/owl.theme.default.min.css'); ?>"> -->
+  <!-- ************ -->
 
 
   <link href="<?php echo base_url('public/css/bootstrap.min.css'); ?>" rel="stylesheet">
@@ -61,6 +66,12 @@
     href="<?php echo base_url('public/images/apple-touch-icon-72x72.png'); ?>">
   <link rel="apple-touch-icon" sizes="http://addgalaxy.com/114x114"
     href="<?php echo base_url('public/images/apple-touch-icon-114x114.png'); ?>">
+
+  <!-- //******owl carousel js files******* -->
+  <!-- <script src="<?php echo base_url('public/owlCarousel/jquery.min.js'); ?>"></script>
+  <script src="<?php echo base_url('public/owlCarousel/owl.carousel.js'); ?>"></script> -->
+  <!-- ************ -->
+
     <script src="https://www.google.com/recaptcha/api.js"></script>
   <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>-->
   <script src="<?php echo base_url('public/js/jquery-1.10.0.min.js'); ?>"></script>
@@ -533,13 +544,19 @@
                   class="fa fa-bars"></i></button>
             </div>
             <div class="col-md-4 col-sm-4 col-xs-12 ab">
-              <div class="select-dropdown select-dropdown2" id="country">
+              <input class="form-control" type="text" name="city" id="search-box" value="<?php echo $location; ?>" onchange="getCity();" onkeyup="searchCity();" placeholder="Search City"/>
+              <div class="city-suggest" id="city-suggest">
+                
+              </div>
+              
+           
+              <!-- <div class="select-dropdown select-dropdown2" id="country">
                 <select name="country" id="country-sel"
                   onchange="getState(this.value);setFooterdata(this.value); getCountry(this.value);get_state_modal(this.value);">
                   <option value="">Select</option>
                   <option value="101">India</option>
                 </select>
-              </div>
+              </div> -->
               <div class="select-dropdown select-dropdown2" id="country123"></div>
             </div>
 

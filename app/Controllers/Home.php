@@ -5,6 +5,8 @@ namespace App\Controllers;
 use App\Models\Categories;
 use App\Models\Settings;
 use App\Models\States;
+use App\Models\Countries;
+use App\Models\Cities;
 use App\Models\Keywords;
 use App\Models\Plans;
 use CodeIgniter\Config\Config;
@@ -15,61 +17,68 @@ class Home extends BaseController
 {
   public function setLocation(){
     $data = [
-       'country_id' => "1",
+       'country_id' => "101",
       'state_id' => "10",
-      'city_id' => "707",
+      'city_id' => "706",
       'region_id' => ""
     ];
     $session = \Config\Services::session();
     $db = \Config\Database::connect();
-    $ip = $_SERVER['REMOTE_ADDR'];
-    $ip_address = isset($_SERVER['HTTP_X_REAL_IP'])?$_SERVER['HTTP_X_REAL_IP']:'45.248.31.9';
+    // $ip = $_SERVER['REMOTE_ADDR'];
+    // $ip_address = isset($_SERVER['HTTP_X_REAL_IP'])?$_SERVER['HTTP_X_REAL_IP']:'45.248.31.9';
 
-    $query1 = json_decode(file_get_contents("https://tools.keycdn.com/geo.json?host=".$ip_address),true);
-    $query = $query1['data']['geo'];
-    //var_dump($query['country_code']);
-      $resquery = $db->query("Select id from countries where sortname='".$query['country_code']."'");
-      $result = $resquery->getResult('array');
-      if(count($result)>0){
-        $data['country_id']=$result[0]['id'];
-      }
-      $resquery1 = $db->query("Select id from states where name='".$query['region_name']."'");
-      $result1 = $resquery1->getResult('array');
-      if(count($result1)>0){
-        $data['state_id']=$result1[0]['id'];
-      }
-      $resquery2 = $db->query("Select id from cities where name='".$query['city']."'");
-      $result2 = $resquery2->getResult('array');
-      if(count($result2)>0){
-        $data['city_id']=$result2[0]['id'];
-      }
+    // $query1 = json_decode(file_get_contents("https://tools.keycdn.com/geo.json?host=".$ip_address),true);
+    // $query = $query1['data']['geo'];
+    
+    //   $resquery = $db->query("Select id from countries where sortname='".$query['country_code']."'");
+    //   $result = $resquery->getResult('array');
+      // if(count($result)>0){
+      //   $data['country_id']=$result[0]['id'];
+      // }
+      // $resquery1 = $db->query("Select id from states where name='".$query['region_name']."'");
+      // $result1 = $resquery1->getResult('array');
+      // if(count($result1)>0){
+      //   $data['state_id']=$result1[0]['id'];
+      // }
+      // $resquery2 = $db->query("Select id from cities where name='".$query['city']."'");
+      // $result2 = $resquery2->getResult('array');
+      // if(count($result2)>0){
+      //   $data['city_id']=$result2[0]['id'];
+      // }
       session()->set($data);
   }
 
 	public function index()
    {
+   
+    // $uri = $this->request->uri;
+    // $city = $uri->getPath();
+    //echo $city;
+    
     
     
     $sessionStateId= session()->get('state_id');
-    $this->setLocation(); 
-    //var_dump($sessionStateId);
-    if(!isset($sessionStateId) || $sessionStateId==''){
-      
-        
-    }
+     //var_dump($sessionStateId);
+    
+     if(!isset($sessionStateId) || $sessionStateId==''){
+        $this->setLocation();
+     }
     
     $db = \Config\Database::connect();
     $session = \Config\Services::session();
     $message = $session->getFlashdata('message');
 	  $cat = new Categories();
-	  $data = $cat->findAll();
+    $data = $cat->findAll();
+    
 	  $catArray = array();
 	  foreach ($data as $key => $value){
 		  if($value['parent_id']==0){
 			$catArray[] = $value; 
 		  }
 	  }
-     
+    // echo "<pre>";
+    // var_dump($catArray);
+    // echo "</pre>";
     foreach ($catArray as $k => $v) {
       foreach ($data as $key => $value1){
         if($v['id']==$value1['parent_id']){
@@ -83,14 +92,31 @@ class Home extends BaseController
     foreach ($catArray as $key => $value) {
       $catArray[$key]['count']=0;
       foreach ($value['subCategory'] as $k1 => $v1) {
+     
+        $state_id = session()->get('state_id');
+        $city_id = session()->get('city_id');
 
-        $res = $db->query("select count(*) from listing where category_id='".$v1['id']."'");
+        $res = $db->query("select count(*) from listing where category_id='".$v1['id']."' 
+        and deleted=0 and  state_id = '".$state_id."' and city_id = '".$city_id."' 
+        ");
         foreach ($res->getResult('array') as $row) {
           $catArray[$key]['subCategory'][$k1]['count'] = $row['count(*)'];
           $catArray[$key]['count'] += $row['count(*)'];
         }
       }
     }
+
+    $city = new Cities();
+    $city_row = $city->where(array('id'=>session()->get('city_id')))->findAll();
+    $state = new States();
+    $state_row = $state->where('id',session()->get('state_id'))->findAll();
+    $country = new Countries();
+    $country_row = $country->where('id',session()->get('country_id'))->findAll();
+    $city_name = $city_row[0]['name'];
+    $state_name = $state_row[0]['name'];
+    $country_name = $country_row[0]['name'];
+    $data['location'] = "$city_name , $state_name , $country_name";
+   
 
     $settings = new Settings();
     $States = new States();
@@ -104,9 +130,12 @@ class Home extends BaseController
     $data['currentpage'] = 'home';
     $pager = \Config\Services::pager();
     $data['message'] = $message;
+    //$data['location'] = "NEPAL";
     
     echo view('home', $data);
   }
+
+
   public function search()
   {
     $keywords = new Keywords();
@@ -121,12 +150,24 @@ class Home extends BaseController
         $condition="state_id='".$request['region']."' and ";
       }
       if($request['category']=='all'){
+        
         $query_keyword = $db->query("Select listing_id from keywords where $condition keywords like '%".$request['keyword']."%'");
+
+        $query_keyword1 = $db->query("Select id from listing where $condition category_id IN (Select id from categories where parent_id ='".$request['category']."') and title like '%".$request['keyword']."%' or description like '%".$request['keyword']."%'");
+        
+
       }else{
-        $query_keyword = $db->query("Select listing_id from keywords where $condition category_id='".$request['category']."' and keywords like '%".$request['keyword']."%'");
+        
+        // $query_keyword = $db->query("Select listing_id from keywords where $condition category_id='".$request['category']."' and keywords like '%".$request['keyword']."%'");
+        $query_keyword = $db->query("Select listing_id from keywords where $condition category_id IN (Select id from categories where parent_id ='".$request['category']."') and keywords like '%".$request['keyword']."%'");
+
+        $query_keyword1 = $db->query("Select id from listing where $condition category_id IN (Select id from categories where parent_id ='".$request['category']."') and title like '%".$request['keyword']."%' or description like '%".$request['keyword']."%'");
       }
       foreach ($query_keyword->getResult('array') as $row) {
         $listingIds[] = $row['listing_id'];
+      }
+      foreach ($query_keyword1->getResult('array') as $row) {
+        $listingIds[] = $row['id'];
       }
     }
     if(count($listingIds)>0){
@@ -338,9 +379,38 @@ class Home extends BaseController
     print_r($citytxt);
   }
 
+  public function suggestCity(){
+    $db = \Config\Database::connect();
+    $pattern = $_POST['pat'];
+
+    $citytxt = '<ul  id="cityText">';
+          
+    $query_city = $db->query("SELECT * FROM cities WHERE name LIKE  '" . $pattern . "%' ORDER BY name ASC LIMIT 20");
+    foreach ($query_city->getResult() as $row_city) {
+      $id = $row_city->id;
+      
+      $query_state = $db->query("SELECT * FROM states WHERE id = $row_city->state_id");
+      $row_state = $query_state->getResult();
+      $row_state = $row_state[0];
+      $state_name = $row_state->name;
+
+      $query_country = $db->query("SELECT * FROM countries WHERE id = $row_state->country_id");
+      $row_country = $query_country->getResult();
+      $country_name = $row_country[0]->name;
+
+      
+      $name = $row_city->name;
+      $citytxt .= '<li id="' . $id . '" onclick="selectCity(' . $id . ')" value="' . $id . '">' . $name .' , '. $state_name.' , '. $country_name.'</li>';
+    }
+     $citytxt .= " </ul>";
+     print_r($citytxt);
+
+  }
+
   public function getCity()
   {
     $db = \Config\Database::connect();
+    
     $state_id = $_POST['con'];
     $data = [
       'state_id' => $state_id
@@ -359,8 +429,28 @@ class Home extends BaseController
     }
     $citytxt .= " </select>";
     print_r($citytxt);
+     
   }
-
+  public function selectLocation(){
+    $id = $_POST['city_id'];
+    $name = $_POST['city_name'];
+    $db = \Config\Database::connect();
+    $query = $db->query("SELECT * FROM cities WHERE id = ".$id."");
+    $row = $query->getResult();
+    $state_id = $row[0]->state_id;
+    $query = $db->query("SELECT * FROM states WHERE id = ".$state_id."");
+    $row = $query->getResult();
+    $state_name = $row[0]->name;
+    $country_id = $row[0]->country_id;
+    $data = [
+      'country_id' => "$country_id",
+     'state_id' => "$state_id",
+     'city_id' => "$id",
+     'region_id' => ""
+   ];
+   session()->set($data);
+   echo($state_name);
+  }
   public function getcitiesforplan()
   {
     $db = \Config\Database::connect();

@@ -25,7 +25,7 @@ echo view('search-bar',$extras);
         <div class="product-slider-main position-r">
           <div class="owl-carousel pro_cat_slider" style="opacity: 0;">
             <?php foreach($featured as $k=>$v){ ?>
-            <div class="rt-container <?php if($k==0) echo'slider-container';?>">
+            <div class="rt-container items <?php if($k==0) echo'slider-container';?>">
               <div class="col-xs-12 col-md-12 p-l-r-0 imgMainWrapper">
                 <div class="imgWrapper">
                   <a href="<?php echo base_url('/ads/view/'.$v['id']);?>">
@@ -260,7 +260,7 @@ echo view('search-bar',$extras);
                                     <?php echo $value1['option_name'];?></span>
                                 </div>
                                 <?php 
-                                    if($j%3==0){
+                                    if($j%2==0){
                                       echo '</div><div class="col-md-12 c'.$j.'">';
                                     }
                                     ?>
@@ -301,7 +301,7 @@ echo view('search-bar',$extras);
                           </div>
                           <div class="col-xs-8 col-md-8">
                             <!--a href="<?php echo base_url('ads/view/'.$v2['id']);?>">-->
-                            <div class="product-item-details product-a">
+                            <div class="product-item-details product-a" style="height:147px;">
                               <div class="row">
                                 <div class="col-md-12 col-xs-12 p-mobile">
                                   <div class="product-item-name" id="product-mobile-view" style="margin-bottom:0px">
@@ -324,28 +324,29 @@ echo view('search-bar',$extras);
                                     ?></p><!-- description -->
                                 </div>
                               </div>
-                            </div>
-                            <?php if($v2['front_attributes']){ 
+                              <?php if($v2['front_attributes']){ 
                                 $i=0;
                                 ?>
-                            <div class="row">
-                              <div class="col-md-12">
-                                <?php foreach ($v2['front_attributes'] as $key1 => $value1) {
-                                    $i++;
-                                    ?>
-                                <div class="col-md-4 col-xs-12 front-attribute c<?php echo $i;?>">
-                                  <span><b><?php echo $value1['attribute_name'];?></b> :
-                                    <?php echo $value1['option_name'];?></span>
+                              <div class="row">
+                                <div class="col-md-12">
+                                  <?php foreach ($v2['front_attributes'] as $key1 => $value1) {
+                                      $i++;
+                                      ?>
+                                  <div class="col-md-4 col-xs-12 front-attribute c<?php echo $i;?>">
+                                    <span><b><?php echo $value1['attribute_name'];?></b> :
+                                      <?php echo $value1['option_name'];?></span>
+                                  </div>
+                                  <?php 
+                                      if($i%2==0){
+                                        echo '</div><div class="col-md-12 c'.$i.'">';
+                                      }
+                                      ?>
+                                  <?php } ?>
                                 </div>
-                                <?php 
-                                    if($i%3==0){
-                                      echo '</div><div class="col-md-12 c'.$i.'">';
-                                    }
-                                    ?>
-                                <?php } ?>
                               </div>
+                              <?php } ?>
                             </div>
-                            <?php } ?>
+                            
                             <!--<div class="row">
                                   <div class="col-md-7">
                                     <ul class="product-item-details-inner" id="product-inner">

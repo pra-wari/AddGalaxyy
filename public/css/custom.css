@@ -74,6 +74,45 @@ body {
     overflow-x:hidden;
     /* letter-spacing: 1px; */
 }
+/* admin allow popup */
+table tbody .allow-popup{
+    position:absolute;
+    /* border:1px solid black; */
+    height:121px;
+    padding: 0px;
+    background: whitesmoke;
+    display: none;
+}
+
+table tbody .allow-popup form input{
+    width: 70%;
+    margin: 25px 20px 20px 23px;
+}
+
+table tbody .allow-popup form button{
+    margin: -5px 20px 20px 51px;
+}
+
+
+/* suggetion box */
+.city-suggest{
+    height:auto;
+    max-height: 200px;
+    background:#e1deec;
+    display:none;
+    overflow-y: scroll;
+    position: absolute;
+    width: 93%;
+    z-index: 2;
+}
+#cityText li{
+    cursor: pointer;
+    margin-left:10px;
+}
+#cityText li:hover{
+    background: #f8f8f4;
+}
+
 .product-image a {
     z-index: 2 !important;
     position: inherit;
@@ -399,6 +438,7 @@ margin-bottom: 15px !important;
     right: -90px;
     float: right;
     box-shadow: inset 0px 0px 0px 4px rgba(255, 255, 255, 0.34);
+    z-index:1;
 }
 
 /*.badge-premium {
@@ -677,7 +717,7 @@ i.fa.fa-caret-right {
     float: right;
 }
 .panel-heading.selected {
-    background-color:#fd8539 !important; !important;
+    background-color:#fd8539 !important; 
     color: #ffffff !important;
 }
 td a {
@@ -4713,7 +4753,7 @@ _______________________________________________________*/
 }
 
 .footer, .footer a, .footer p {
-    color: #878787;
+    /* color: #878787; */
 }
 
 .footer a:hover {
@@ -5450,6 +5490,9 @@ ul.sub_list li span {
     font-size: 16px;
     font-weight: 500;
     margin: 0 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .rt-container {
@@ -6226,7 +6269,7 @@ a.cat-inac {
     padding-top: 20px;
     }
     .singleAds{
-        height: 152px;
+        height: auto;
     }
     .product-slider-view-1 .owl-item {
       /*width: 183px !important;*/

@@ -25,6 +25,8 @@ class Subcategory extends Controller
 	}
 /*-------------------------------------View Table -------------------------------*/
 	public function view($viewId){
+    $state_id = session()->get('state_id');
+    $city_id = session()->get('city_id');
     $db = \Config\Database::connect();
     $listing = new Listing();
    // $listing->orderBy('id', 'desc');
@@ -57,6 +59,22 @@ class Subcategory extends Controller
         }
       }
     }
+
+    foreach ($catArray as $key => $value) {
+      $catArray[$key]['count']=0;
+      foreach ($value['subCategory'] as $k1 => $v1) {
+     
+       
+  
+        $res = $db->query("select count(*) from listing where category_id='".$v1['id']."' 
+        and state_id = '".$state_id."' and city_id = '".$city_id."' 
+        ");
+        foreach ($res->getResult('array') as $row) {
+          $catArray[$key]['subCategory'][$k1]['count'] = $row['count(*)'];
+          $catArray[$key]['count'] += $row['count(*)'];
+        }
+      }
+    }
     // echo $viewId;
 
      $query = $db->query("SELECT parent_id FROM categories WHERE id=".$viewId);
@@ -67,7 +85,7 @@ class Subcategory extends Controller
         }else{
           $parent_category_id  = $viewId;
         }
-
+        //echo "$parent_category_id";
     $queryatt = $db->query("SELECT * FROM attributes WHERE valid=1 AND deleted=0 AND parent_category_id=$parent_category_id");
     $attributes1 = array();
     foreach ($queryatt->getResult() as $rowatt)
@@ -117,7 +135,7 @@ class Subcategory extends Controller
     $premium = array();
     $freeAds = array();
     //$featured = $listing->where('featured','1')->findAll();
-    $queryf = $db->query("SELECT * FROM listing WHERE featured=1 and category_id=$viewId ORDER BY id DESC");
+    $queryf = $db->query("SELECT * FROM listing WHERE featured=1 and category_id=$viewId and state_id = $state_id and city_id = $city_id ORDER BY id DESC");
     $featured = $queryf->getResult('array');
     $regionArray = $this->getallregion();
     /*if(count($regionArray)>0){
@@ -236,7 +254,8 @@ class Subcategory extends Controller
 		echo view('sub-category',$data);
    }
 
-  function getFrontAttribute($listing){
+ 
+   function getFrontAttribute($listing){
     $db = \Config\Database::connect();
     foreach ($listing as $k1 => $v1) {
       $query = $db->query("SELECT attributes.`attribute_name`,attribute_options.`option_name`,attributes.`show_in_listing` FROM rel_listing_attributes 
@@ -251,40 +270,26 @@ class Subcategory extends Controller
 function getallregion(){
      
   $db = \Config\Database::connect();
-$locationArray = array();
-session()->get();
-// print_r(session()->get('state'));
-if(isset($_SESSION['region_id']) && $_SESSION['region_id']!=""){
-  // echo "region";
-  $locationArray[0] = $_SESSION['region_id'];
-}else if(isset($_SESSION['city_id']) && $_SESSION['city_id']!=""){
+  $locationArray = array();
+  session()->get();
+  // print_r(session()->get('state'));
+  if(isset($_SESSION['region_id']) && $_SESSION['region_id']!=""){
+    // echo "region";
+    $locationArray[0] = $_SESSION['region_id'];
+  }else if(isset($_SESSION['city_id']) && $_SESSION['city_id']!=""){
 
-  $query = $db->query("SELECT id FROM region WHERE city_id=".$_SESSION['city_id']);
-  $result = array();
-  $i=0;
-  foreach ($query->getResult() as $row)
-  {
-    array_push($result, $row->id);
-  }
-  // echo "city";
-  $locationArray = $result;
-}else if(isset($_SESSION['state_id']) && $_SESSION['state_id']!=""){
-  $state_id = $_SESSION['state_id'];
-  $query = $db->query("SELECT id FROM region WHERE city_id IN(SELECT city_id FROM cities WHERE state_id =".$state_id.")");
-  $result = array();
-  $i=0;
-  foreach ($query->getResult() as $row)
-  {
-    
-    array_push($result, $row->id);
-  }
-  // echo "state";
-  $locationArray = $result;
-    
-  }else if(isset($_SESSION['country_id']) && $_SESSION['country_id']!=""){
-    $country_id = $_SESSION['country_id'];
-    // echo "SELECT id FROM region WHERE city_id IN(SELECT id FROM cities WHERE state_id IN(SELECT id FROM states WHERE country_id=".$country_id."))";
-    $query = $db->query("SELECT id FROM region WHERE city_id IN(SELECT id FROM cities WHERE state_id IN(SELECT id FROM states WHERE country_id=".$country_id."))");
+    $query = $db->query("SELECT id FROM region WHERE city_id=".$_SESSION['city_id']);
+    $result = array();
+    $i=0;
+    foreach ($query->getResult() as $row)
+    {
+      array_push($result, $row->id);
+    }
+    // echo "city";
+    $locationArray = $result;
+  }else if(isset($_SESSION['state_id']) && $_SESSION['state_id']!=""){
+    $state_id = $_SESSION['state_id'];
+    $query = $db->query("SELECT id FROM region WHERE city_id IN(SELECT city_id FROM cities WHERE state_id =".$state_id.")");
     $result = array();
     $i=0;
     foreach ($query->getResult() as $row)
@@ -292,12 +297,26 @@ if(isset($_SESSION['region_id']) && $_SESSION['region_id']!=""){
       
       array_push($result, $row->id);
     }
+    // echo "state";
     $locationArray = $result;
       
-  }else{
-    $locationArray = array();
-  }
-  return $locationArray;
+    }else if(isset($_SESSION['country_id']) && $_SESSION['country_id']!=""){
+      $country_id = $_SESSION['country_id'];
+      // echo "SELECT id FROM region WHERE city_id IN(SELECT id FROM cities WHERE state_id IN(SELECT id FROM states WHERE country_id=".$country_id."))";
+      $query = $db->query("SELECT id FROM region WHERE city_id IN(SELECT id FROM cities WHERE state_id IN(SELECT id FROM states WHERE country_id=".$country_id."))");
+      $result = array();
+      $i=0;
+      foreach ($query->getResult() as $row)
+      {
+        
+        array_push($result, $row->id);
+      }
+      $locationArray = $result;
+        
+    }else{
+      $locationArray = array();
+    }
+    return $locationArray;
  
 }
 
@@ -397,7 +416,7 @@ public function filter(){
   }
     $i++;
   }
-if(isset($att[0])){
+ if(isset($att[0])){
   $att_filterArray = $att[0];
   // print_r($att_filterArray);
   for($i = 1; $i < count($att); $i++){

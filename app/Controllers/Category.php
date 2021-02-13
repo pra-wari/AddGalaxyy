@@ -84,43 +84,64 @@ class Category extends Controller
        }
     }
    }
+
+   foreach ($catArray as $key => $value) {
+    $catArray[$key]['count']=0;
+    foreach ($value['subCategory'] as $k1 => $v1) {
    
-// echo "SELECT * FROM attributes WHERE valid=1 AND deleted=0 AND parent_category_id=$viewId";
-$queryatt = $db->query("SELECT * FROM attributes WHERE valid=1 AND deleted=0 AND parent_category_id=$viewId");
-$attributes1 = array();
-foreach ($queryatt->getResult() as $rowatt)
-{
-    $temp['id'] = $rowatt->id;
-    $temp['attribute_name'] = $rowatt->attribute_name;
-    $temp['type'] = $rowatt->type;
-    $temp['created_at'] = $rowatt->created_at;
-    $temp['modified_at'] = $rowatt->modified_at;
-    $temp['attribute_type'] = $rowatt->attribute_type;
-    $temp['parent_category_id'] = $rowatt->parent_category_id;
-    // echo "SELECT * FROM attribute_options WHERE valid=1 AND deleted=0 AND parent_attribute_id=".$temp['id'];
-    $query_subatt = $db->query("SELECT * FROM attribute_options WHERE valid=1 AND deleted=0 AND parent_attribute_id=".$temp['id']);
-    $result_subatt = array();
-    $i=0;
-    $temp3 = array();
-    foreach ($query_subatt->getResult() as $row_subatt)
-    {
-      $temp2['id'] = $row_subatt->id;
-      $temp2['option_name'] = $row_subatt->option_name;
-      $temp2['parent_attribute_id'] = $row_subatt->parent_attribute_id;
-      $temp2['created_at'] = $row_subatt->created_at;
-      $temp2['modified_at'] = $row_subatt->modified_at;
-      $temp2['valid'] = $row_subatt->valid;
-      $temp2['deleted'] = $row_subatt->deleted;
-      array_push($temp3, $temp2);
-      $i++;
+      $state_id = session()->get('state_id');
+      $city_id = session()->get('city_id');
+
+      $res = $db->query("select count(*) from listing where category_id='".$v1['id']."' 
+      and deleted = 0 and state_id = '".$state_id."' and city_id = '".$city_id."' 
+      ");
+      foreach ($res->getResult('array') as $row) {
+        $catArray[$key]['subCategory'][$k1]['count'] = $row['count(*)'];
+        $catArray[$key]['count'] += $row['count(*)'];
+      }
     }
-    $temp['option']=$temp3;
-    // echo "<pre>";
-    // print_r($temp);
-    // echo "</pre>";
+  }
+
+  
+  
+   
+    // echo "SELECT * FROM attributes WHERE valid=1 AND deleted=0 AND parent_category_id=$viewId";
+    $queryatt = $db->query("SELECT * FROM attributes WHERE valid=1 AND deleted=0 AND parent_category_id=$viewId");
+    $attributes1 = array();
+    //print_r($queryatt->getResult());
+    foreach ($queryatt->getResult() as $rowatt)
+    {
+        $temp['id'] = $rowatt->id;
+        $temp['attribute_name'] = $rowatt->attribute_name;
+        $temp['type'] = $rowatt->type;
+        $temp['created_at'] = $rowatt->created_at;
+        $temp['modified_at'] = $rowatt->modified_at;
+        $temp['attribute_type'] = $rowatt->attribute_type;
+        $temp['parent_category_id'] = $rowatt->parent_category_id;
+        // echo "SELECT * FROM attribute_options WHERE valid=1 AND deleted=0 AND parent_attribute_id=".$temp['id'];
+        $query_subatt = $db->query("SELECT * FROM attribute_options WHERE valid=1 AND deleted=0 AND parent_attribute_id=".$temp['id']);
+        $result_subatt = array();
+        $i=0;
+        $temp3 = array();
+        foreach ($query_subatt->getResult() as $row_subatt)
+        {
+          $temp2['id'] = $row_subatt->id;
+          $temp2['option_name'] = $row_subatt->option_name;
+          $temp2['parent_attribute_id'] = $row_subatt->parent_attribute_id;
+          $temp2['created_at'] = $row_subatt->created_at;
+          $temp2['modified_at'] = $row_subatt->modified_at;
+          $temp2['valid'] = $row_subatt->valid;
+          $temp2['deleted'] = $row_subatt->deleted;
+          array_push($temp3, $temp2);
+          $i++;
+        }
+        $temp['option']=$temp3;
+        // echo "<pre>";
+        // print_r($temp);
+        // echo "</pre>";
         array_push($attributes1, $temp);
-}
-// print_r($attributes1);
+    }
+    // print_r($attributes1);
 
     $att = new Attributes();
     $data = $att->where('parent_attribute_id',$viewId)->findAll();
@@ -145,23 +166,30 @@ foreach ($queryatt->getResult() as $rowatt)
         $cond_region = "1=1 and ";
       }
       $premium = array();
-      $res = $db->query("SELECT * FROM listing WHERE featured=1 AND category_id IN (SELECT id FROM categories WHERE parent_id=".$viewId.")");
+      $res = $db->query("SELECT * FROM listing WHERE featured=1 AND deleted=0 AND category_id IN (SELECT id FROM categories WHERE parent_id=".$viewId.")");
       $featured = $this->addcatBreadcrumb($res->getResult('array'));
       $result = $listing->where('category_id',$viewId)->findAll();
       $pager = \Config\Services::pager();
       $data['categories'] = $catArray;	
-      $res = $db->query("SELECT * FROM listing WHERE premium=1 AND category_id IN (SELECT id FROM categories WHERE parent_id=".$viewId.")");
+      $res = $db->query("SELECT * FROM listing WHERE premium=1 AND deleted=0 AND category_id IN (SELECT id FROM categories WHERE parent_id=".$viewId.")");
       $premium = $this->addcatBreadcrumb($res->getResult('array'));
       $randomkey = rand(0,count($premium)-1);
       shuffle($featured);
-      $query = $db->query("Select * from listing where ".$cond_region." premium=0 and `category_id` In (SELECT m.id FROM categories e INNER JOIN categories m ON e.id = m.parent_id
-      where e.id='".$viewId."')");
+      // $query = $db->query("Select * from listing where ".$cond_region." premium=0 and `category_id` In (SELECT m.id FROM categories e INNER JOIN categories m ON e.id = m.parent_id
+      // where e.id='".$viewId."') Order By date DESC");
+
+      $state_id = session()->get('state_id');
+      $city_id = session()->get('city_id');
+      $query = $db->query("Select * from listing where ".$cond_region." premium=0 and  `category_id` In (SELECT m.id FROM categories e INNER JOIN categories m ON e.id = m.parent_id where e.id='".$viewId."')
+      and deleted=0 and state_id = '".$state_id."' and city_id = '".$city_id."' Order By date DESC");
+     // echo $query->num_rows();
+
       $query1 = $db->query("Select * from listing where sgallery=1 and `category_id` In (SELECT m.id FROM categories e INNER JOIN categories m ON e.id = m.parent_id
       where e.id='".$viewId."')");
       $finalResult = $this->addcatBreadcrumb($query->getResult('array'));
-      foreach ($finalResult as $ks1 => $vs1) {
-       //print_r($vs1);
-      }
+      //foreach ($finalResult as $ks1 => $vs1) {
+       // print_r($vs1);
+     // }
       $finalResult=$this->getFrontAttribute($finalResult);
       $data['listing'] = $finalResult;
       //$data['message'] = $message;
@@ -203,8 +231,12 @@ foreach ($queryatt->getResult() as $rowatt)
       $requestMain = \Config\Services::request();
       $data['currentpage'] = $requestMain->uri->getSegment(2);
       //$data['attributes'] = array();
+      // echo "<pre>";
+      // echo $data;
+      // echo "</pre>";
       echo view('category',$data);
    }
+
    public function addmainBreadcrumb($catid){
     $db = \Config\Database::connect();
     $query = $db->query("SELECT name FROM categories WHERE id='".$catid."'");

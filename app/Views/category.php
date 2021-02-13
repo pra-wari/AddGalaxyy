@@ -62,6 +62,7 @@ echo view('search-bar',$extras);
                     </div>
                   </div>
                   
+                  
                   <?php foreach($listing as $k2=>$v2){
                          ?>
                   <div class="row freeadd">
@@ -76,7 +77,7 @@ echo view('search-bar',$extras);
                               </a>
                             </div>
                           </div>
-                          <div class="col-xs-8 col-md-8">
+                          <div class="col-xs-8 zcol-md-8">
                             <!--<a href="<?php echo base_url('ads/view/'.$v2['id']);?>">-->
                               <div class="product-item-details product-a">
                                 <div class="row">

@@ -48,7 +48,7 @@ $id = session()->get('id');
 </div>
 <div class="footer">
   <div class="container-fluid">
-    <div class="row hidemobile" style="margin-bottom: -80px;margin-top:20px;">
+    <div class="row hidemobile" style="margin: 20px 0px -80px 215px">
       <div class="col-md-3">
         <ul>
         <?php 
@@ -275,23 +275,67 @@ function getState(val) {
     });
 }
 
-function getCity(val) {
-    // return false;
+function searchCity(){
+    
+    var x = $("#search-box").val();
     $.ajax({
         type: 'POST',
-        url: "<?php echo base_url();?>/home/getCity",
+        url: "<?php echo base_url();?>/home/suggestCity",
         data: {
-            'con': val
+            'pat': x
         },
         success: function(data) {
-            console.log(data);
-            $("#city-select").html(data);
-            $("#city-select1").html(data);
-            // $("#hidden").html(con2);
+            //console.log(data);
+            $("#city-suggest").html(data);
+            $(".city-suggest").css({"display":"block"});
+            
         },
     });
     //location.reload();
 }
+
+function selectCity(clicked_city){
+    var city = $("#"+clicked_city+"").text();
+    $.ajax({
+        type: 'POST',
+        url: "<?php echo base_url();?>/home/selectLocation",
+        data: {
+            'city_id': clicked_city,
+            'city_name' : city
+        },
+        success: function(data) {
+            $(".city-suggest").css({"display":"none"});
+            $("#search-box").val(city);
+           // window.location= "http://localhost/AddGalaxyy/state/"+data;
+            //window.location="<?php base_url()?>state/"+data;
+            
+        },
+    });
+    location.reload(true);
+    //window.location = "<?php base_url()?>";
+    
+}
+$("#search-box").focusout(function(){
+    $(".city-suggest").slideUp(700);
+});
+
+// function getCity() {
+//     val = 101;
+//     $.ajax({
+//         type: 'POST',
+//         url: "<?php echo base_url();?>/home/getCity",
+//         data: {
+//             'con': val
+//         },
+//         success: function(data) {
+//             console.log(data);
+//             $("#city-select").html(data);
+//             $("#city-select1").html(data);
+//             // $("#hidden").html(con2);
+//         },
+//     });
+//     location.reload();
+// }
 
 function getRegion(val) {
     // return false;

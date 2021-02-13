@@ -62,6 +62,7 @@ $d = array('page'=> $module,'date'=>$dateArray,'currentPage'=>$currentpage,'plan
                     <div class="row" id="filterResult1">
                         <div class="container1">
                             <div class="col-md-12">
+                                
                                 <div class="table-responsive" style="overflow:hidden;">
                                     <table id="myTable" class="admin-dashboard-table table">
                                         <thead>
@@ -97,54 +98,65 @@ $d = array('page'=> $module,'date'=>$dateArray,'currentPage'=>$currentpage,'plan
                                                 <td><?php echo $value['userEmail'];?></td>
                                                 
                                                 <td>
-    <?php if($value['premium_status']==1) {   ?>
-    <a href="<?php echo base_url()."/admin/planactive/premium/1/".$value['id'];
-?>">Active Premium</a><br><br>
-    <?php } ?>
-    <?php if($value['sgallery_status']==1) {   ?>
-    <a href="<?php echo base_url()."/admin/planactive/sgallery/1/".$value['id'];
-?>">Active SideBar</a><br><br>
-    <?php } ?>
-    <?php if($value['featured_status']==1) {   ?>
-    <a href="<?php echo base_url()."/admin/planactive/featured/1/".$value['id'];
-?>">Active Slider</a><br><br>
-    <?php } ?>
-    
-    <?php if($value['premium_status']==2) {   ?>
-    <a href="<?php echo base_url()."/admin/planactive/premium/0/".$value['id'];
-?>">Deactive Premium</a><br><br>
-    <?php } ?>
-    <?php if($value['sgallery_status']==2) {   ?>
-    <a href="<?php echo base_url()."/admin/planactive/sgallery/0/".$value['id'];
-?>">Deactive SideBar</a><br><br>
-    <?php } ?>
-    <?php if($value['featured_status']==2) {   ?>
-    <a href="<?php echo base_url()."/admin/planactive/featured/0/".$value['id'];
-?>">Deactive Slider</a><br><br>
-    <?php } ?>
-    </td>
-    <td>
-    <a href="<?php echo base_url()."/admin/planactive/premium/1/".$value['id'];
-?>">Allow Premium</a>
+                                            <?php if($value['premium_status']==1) {   ?>
+                                            <a href="<?php echo base_url()."/admin/planactive/premium/1/".$value['id'];
+                                        ?>">Active Premium</a><br><br>
+                                            <?php } ?>
+                                            <?php if($value['sgallery_status']==1) {   ?>
+                                            <a href="<?php echo base_url()."/admin/planactive/sgallery/1/".$value['id'];
+                                        ?>">Active SideBar</a><br><br>
+                                            <?php } ?>
+                                            <?php if($value['featured_status']==1) {   ?>
+                                            <a href="<?php echo base_url()."/admin/planactive/featured/1/".$value['id'];
+                                        ?>">Active Slider</a><br><br>
+                                            <?php } ?>
+                                            
+                                            <?php if($value['premium_status']==2) {   ?>
+                                            <a href="<?php echo base_url()."/admin/planactive/premium/0/".$value['id'];
+                                        ?>">Deactive Premium</a><br><br>
+                                            <?php } ?>
+                                            <?php if($value['sgallery_status']==2) {   ?>
+                                            <a href="<?php echo base_url()."/admin/planactive/sgallery/0/".$value['id'];
+                                        ?>">Deactive SideBar</a><br><br>
+                                            <?php } ?>
+                                            <?php if($value['featured_status']==2) {   ?>
+                                            <a href="<?php echo base_url()."/admin/planactive/featured/0/".$value['id'];
+                                        ?>">Deactive Slider</a><br><br>
+                                            <?php } ?>
+                                            </td>
+                                            <td>
+                                            <a href="#" class="premium" id="<?php echo $value['id']?>">Allow Premium<?php foreach($value['plans'] as $key1 => $value1){
+                                            echo "(".$value1['remaining'].")";
+                                        }?></a>
+                                   
+                                   <div class="col-md-2 allow-popup" id="<?php echo "prepopup". $value['id'];?>">
+                                        <button type="button" value="<?php echo $value['id'] ?>" class="close prepopupclose">&times;</button>
+                                        <form action="<?php echo base_url()."/admin/planactive/premium/1/".$value['id'];
+                                        ?>" method="post">
+                                            <input class="form-control" name="days" type="text" placeholder="Type days"/>
+                                            <button class="btn btn-info" type="submit">Allow</button>
+                                        </form>
+                                    </div>
 
-<a href="<?php echo base_url()."/admin/planactive/sgallery/1/".$value['id'];
-?>">Allow SideBar</a><br><br>
 
-<a href="<?php echo base_url()."/admin/planactive/featured/1/".$value['id'];
-?>">Allow Slider</a><br><br>
-    
-    </td>
-    <td>
-         <a href="<?php echo base_url()."/admin/planactive/premium/0/".$value['id'];
-?>">Disallow Premium</a>
+                                        <a href="<?php echo base_url()."/admin/planactive/sgallery/1/".$value['id'];
+                                        ?>">Allow SideBar</a><br><br>
 
-<a href="<?php echo base_url()."/admin/planactive/sgallery/0/".$value['id'];
-?>">Disallow SideBar</a><br><br>
+                                        <a href="<?php echo base_url()."/admin/planactive/featured/1/".$value['id'];
+                                        ?>">Allow Slider</a><br><br>
+                                            
+                                            </td>
+                                            <td>
+                                                <a href="<?php echo base_url()."/admin/planactive/premium/0/".$value['id'];
+                                        ?>">Disallow Premium</a>
 
-<a href="<?php echo base_url()."/admin/planactive/featured/0/".$value['id'];
-?>">Disallow Slider</a><br><br>
-        
-    </td>
+                                        <a href="<?php echo base_url()."/admin/planactive/sgallery/0/".$value['id'];
+                                        ?>">Disallow SideBar</a><br><br>
+
+                                        <a href="<?php echo base_url()."/admin/planactive/featured/0/".$value['id'];
+                                        ?>">Disallow Slider</a><br><br>
+                                                
+                                            </td>
                                                 
                                                 <td><?php echo $value['categoryName'];?></td>
                                                 <td><?php foreach ($value['plans'] as $key1 => $value1) {
@@ -154,7 +166,7 @@ $d = array('page'=> $module,'date'=>$dateArray,'currentPage'=>$currentpage,'plan
                                                         echo $value1['plan_name']." (<a href='#'>Expired</a>)"."<br />";
                                                     }
                                                     ?>
-(<a class="option upgradenow" data-planid="<?php echo $value1['currentPlan'];?>" data-id="<?php echo $value['id'];?>">Upgrade</a>)
+                                     (<a class="option upgradenow" data-planid="<?php echo $value1['currentPlan'];?>" data-id="<?php echo $value['id'];?>">Upgrade</a>)
                                                     <?php
                                                     }?>
                                                 </td>
@@ -206,6 +218,17 @@ $d = array('page'=> $module,'date'=>$dateArray,'currentPage'=>$currentpage,'plan
                                 // $(document).on('change','#changeCountry',function(){
                                 //     getState($(this).val());
                                 // });
+                                $(".premium").click(function(){
+                                    $(".allow-popup").slideUp();
+                                    var id = $(this).attr('id');
+                                    var popup = "#prepopup"+id;
+                                    $(popup).slideDown('slow');
+                                });
+                                $(".prepopupclose").click(function(){
+                                    var id = $(this).attr('value');
+                                    var popup = "#prepopup"+id;
+                                    $(popup).slideUp('slow');
+                                });
                             });
                         </script>
                     </div>

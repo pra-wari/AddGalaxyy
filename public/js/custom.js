@@ -108,7 +108,7 @@ $(function() {
     /* ------------ OWL Slider Start  ------------- */
 
       // Sub category
-
+      
 
 
       /* ----- pro_cat_slider Start  ------ */
@@ -127,6 +127,8 @@ $(function() {
           navigation: true,
           pagination: false,
           rewindNav:true,
+          rewindSpeed : 0,
+          checkVisibility: true,
           lazyLoad:false,
           itemsDesktop : [1199, 4],
           itemsDesktopSmall : [991, 3],

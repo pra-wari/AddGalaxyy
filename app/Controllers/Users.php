@@ -706,7 +706,11 @@ class Users extends Controller
 				$insertedId = $listing->insertID();
 		
 				if($insertedId){
-					$cat_Id = $request['subcategory']?$request['subcategory']:$request['category'];
+					// $cat_Id = $request['subcategory']?$request['subcategory']:$request['category'];
+					$parent_cat_id = $request['category'];
+					$db->query("UPDATE categories SET count = count+1 WHERE id='".$parent_cat_id."'");
+					$cat_Id = $request['subcategory'];
+					if($cat_Id != NULL)
 					$db->query("UPDATE categories SET count = count + 1 WHERE id = '".$cat_Id."'");
 					if($imagefile = $this->request->getFiles())
 					{	
@@ -821,7 +825,7 @@ class Users extends Controller
 					];
 					$Invoice->save($invoiceData);
 					$session->setFlashdata('success', 'Your Ad Request successfully Received');
-					return redirect()->to('/');
+					return redirect()->to(base_url('/dashboard'));
 				}
 			}
 		}
